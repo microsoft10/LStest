@@ -49,7 +49,7 @@ namespace Trundle
             E = new Spell(SpellSlot.E, 1000);
             R = new Spell(SpellSlot.R, 650);
 
-			W.SetSkillshot(.25f, 300f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+			W.SetSkillshot(.25f, 750f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 			E.SetSkillshot(.25f, 1f, float.MaxValue, false, SkillshotType.SkillshotLine);
           
             SpellList.Add(Q);
@@ -87,16 +87,18 @@ namespace Trundle
             menu.SubMenu("Harass").AddItem(new MenuItem("UseQHarass", "Use Q").SetValue(true));
             menu.SubMenu("Harass").AddItem(new MenuItem("UseWHarass", "Use W").SetValue(false));
             menu.SubMenu("Harass").AddItem(new MenuItem("UseEHarass", "Use E").SetValue(false));
+			menu.SubMenu("Harass").AddItem(new MenuItem("HarassMana", "Min. Mana Percent: ").SetValue(new Slider(50, 100, 0)));
             menu.SubMenu("Harass").AddItem(new MenuItem("HarassActive", "Harass!").SetValue(new KeyBind(menu.Item("Farm").GetValue<KeyBind>().Key, KeyBindType.Press)));
             menu.SubMenu("Harass").AddItem(new MenuItem("HarassActiveT", "Harass (toggle)!").SetValue(new KeyBind("Y".ToCharArray()[0], KeyBindType.Toggle)));
 
             //Farming menu:
-          /*   menu.AddSubMenu(new Menu("Farm", "Farm"));
+            menu.AddSubMenu(new Menu("Farm", "Farm"));
             menu.SubMenu("Farm").AddItem(new MenuItem("UseQFarm", "Use Q").SetValue(true));
             menu.SubMenu("Farm").AddItem(new MenuItem("UseWFarm", "Use W").SetValue(false));
-            menu.SubMenu("Farm").AddItem(new MenuItem("UseEFarm", "Use E").SetValue(false));
+			menu.SubMenu("Farm").AddItem(new MenuItem("FarmMinion", "Min. Minion use W: ").SetValue(new Slider(6, 12, 0)));
+            menu.SubMenu("Farm").AddItem(new MenuItem("FarmMana", "Min. Mana Percent: ").SetValue(new Slider(50, 100, 0)));
             menu.SubMenu("Farm").AddItem(new MenuItem("LaneClearActive", "Farm!").SetValue(new KeyBind(menu.Item("LaneClear").GetValue<KeyBind>().Key, KeyBindType.Press)));
-            menu.SubMenu("Farm").AddItem(new MenuItem("LastHitQQ", "Last hit with Q").SetValue(new KeyBind("A".ToCharArray()[0], KeyBindType.Press))); */
+            /* menu.SubMenu("Farm").AddItem(new MenuItem("LastHitQQ", "Last hit with Q").SetValue(new KeyBind("A".ToCharArray()[0], KeyBindType.Press))); */
 
             //Misc Menu:
             menu.AddSubMenu(new Menu("Misc", "Misc"));
@@ -178,8 +180,7 @@ namespace Trundle
 
             if (useW && wTarget != null && W.IsReady() && Player.Distance(wTarget) < W.Range)
             {
-                var pred = W.GetPrediction(wTarget);
-                W.Cast(pred.CastPosition);
+                W.Cast(wTarget);
                 return;
             }
 
@@ -217,6 +218,9 @@ namespace Trundle
 
         private static void Harass()
         {
+		var existsMana = vPlayer.MaxMana / 100 * menu.Item("HarassMana").GetValue<Slider>().Value;
+            if (vPlayer.Mana <= existsMana) return;
+			
             UseSpells(menu.Item("UseQHarass").GetValue<bool>(), menu.Item("UseWHarass").GetValue<bool>(),
                 menu.Item("UseEHarass").GetValue<bool>(), false);
         }
@@ -287,18 +291,18 @@ namespace Trundle
 				
 				
 
-               /*  if (menu.Item("LastHitQQ").GetValue<KeyBind>().Active)
-                    lastHit();
+                /* if (menu.Item("LastHitQQ").GetValue<KeyBind>().Active)
+                    lastHit(); */
 
                 if (menu.Item("LaneClearActive").GetValue<KeyBind>().Active)
-                    Farm(); */
+                    Farm();
 
             }
         }
 
 		
 		
-      /*   public static void lastHit()
+        /* public static void lastHit()
         {
             if (!Orbwalking.CanMove(40)) return;
 
@@ -315,29 +319,41 @@ namespace Trundle
                     }
                 }
             }
-        }
+        } */
 
         private static void Farm()
         {
-            var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.NotAlly);
-            var rangedMinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range + E.Width, MinionTypes.All);
+            if (!Orbwalking.CanMove(40)) return;
 
-            var useQ = menu.Item("UseQFarm").GetValue<bool>();
-           
+            var existsMana = vPlayer.MaxMana / 100 * menu.Item("FarmMana").GetValue<Slider>().Value;
+            if (vPlayer.Mana <= existsMana) return;
 
-           if (useQ && Q.IsReady())
+            var farmQ = menu.Item("UseQFarm").GetValue<bool>();
+            var farmW = menu.Item("UseWFarm").GetValue<bool>();
+
+            if (farmQ && Q.IsReady())
             {
-                var minionsQ = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
-
-                foreach (var vMinion in from vMinion in minionsQ
-                    let vMinionEDamage = Player.GetSpellDamage(vMinion, SpellSlot.Q)
-                    where vMinion.Health <= vMinionEDamage && vMinion.Health > Player.GetAutoAttackDamage(vMinion)
-                    select vMinion) 
+              var minionsQ = MinionManager.GetMinions(vPlayer.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.NotAlly, MinionOrderTypes.Health);
+                foreach (var vMinion in minionsQ)
                 {
-                    Q.CastOnUnit(Player);
+                    var vMinionQDamage = vPlayer.GetSpellDamage(vMinion, SpellSlot.Q);
+
+                    if (vMinion.Health <= vMinionQDamage - 20)
+                        Q.Cast();                        
                 }
             }
-        } */
+        
+            if (farmW && W.IsReady())
+            {
+                var minionsW = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, W.Range + W.Width,
+                    MinionTypes.Ranged);
+                var wPos = W.GetCircularFarmLocation(minionsW);
+                if (wPos.MinionsHit >= menu.Item("FarmMinion").GetValue<Slider>().Value)
+                    W.Cast(wPos.Position);
+            }
+        }
+
+        
 
        
         private static void Drawing_OnDraw(EventArgs args)
