@@ -37,7 +37,7 @@ namespace Trundle
 
         private static void Game_OnGameLoad(EventArgs args)
         {
-            //Thanks to Esk0r
+ 
             Player = ObjectManager.Player;
 
             //check to see if correct champ
@@ -58,7 +58,7 @@ namespace Trundle
             SpellList.Add(R);
 
             //Create the menu
-            menu = new Menu(ChampionName, ChampionName, true);
+            menu = new Menu("SG Trundle", "SG Trundle", true);
 
             //Orbwalker submenu
             menu.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
@@ -78,7 +78,7 @@ namespace Trundle
             menu.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "Use E").SetValue(true));
             menu.SubMenu("Combo").AddItem(new MenuItem("UseRCombo", "Use R Finish").SetValue(true));
             menu.SubMenu("Combo").AddItem(new MenuItem("HPForR", "Use R if my HP < X%").SetValue(new Slider(50, 100, 0)));
-			menu.SubMenu("Combo").AddItem(new MenuItem("eHPForR", "Use R if enemy HP >").SetValue(new Slider(3000, 5000, 0)));
+			menu.SubMenu("Combo").AddItem(new MenuItem("eHPForR", "Use R if enemy max HP >").SetValue(new Slider(3000, 5000, 0)));
             menu.SubMenu("Combo").AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(menu.Item("Orbwalk").GetValue<KeyBind>().Key, KeyBindType.Press)));
 			menu.SubMenu("Combo").AddItem(new MenuItem("escape", "Flee !!!").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
 
@@ -191,14 +191,14 @@ namespace Trundle
                 return;
             }
 
-            //regular combo
+            //R max HP
             if (rTarget != null && R.IsReady() && menu.Item("HPForR").GetValue<Slider>().Value >= ((Player.Health / Player.MaxHealth) * 100))
 			{	
                 R.CastOnUnit(rTarget, packets());
                 return;
             }
 			
-			//regular combo
+			//R my HP
             if (rTarget != null && R.IsReady() && rTarget.MaxHealth >= menu.Item("eHPForR").GetValue<Slider>().Value)
 			{	
                 R.CastOnUnit(rTarget, packets());
@@ -337,10 +337,11 @@ namespace Trundle
               var minionsQ = MinionManager.GetMinions(vPlayer.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.NotAlly, MinionOrderTypes.Health);
                 foreach (var vMinion in minionsQ)
                 {
-                    var vMinionQDamage = vPlayer.GetSpellDamage(vMinion, SpellSlot.Q);
+                  /*   var vMinionQDamage = vPlayer.GetSpellDamage(vMinion, SpellSlot.Q);
 
-                    if (vMinion.Health <= vMinionQDamage - 20)
-                        Q.Cast();                        
+                    if (vMinion.Health <= vMinionQDamage - 20) */
+                        Q.Cast();  
+                        /* Player.IssueOrder(GameObjectOrder.AttackUnit, minion);	 */					
                 }
             }
         
