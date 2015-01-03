@@ -180,7 +180,8 @@ namespace Trundle
 
             if (useW && wTarget != null && W.IsReady() && Player.Distance(wTarget) < W.Range)
             {
-                W.Cast(wTarget);
+                var pred = W.GetPrediction(wTarget);
+                W.Cast(pred.CastPosition);
                 return;
             }
 
