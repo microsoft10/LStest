@@ -14,7 +14,7 @@ namespace Trundle
     class Program
     {
         public const string ChampionName = "Trundle";
-
+        private static readonly Obj_AI_Hero vPlayer = ObjectManager.Player;
         //Orbwalker instance
         public static Orbwalking.Orbwalker Orbwalker;
 		//Spells
@@ -27,7 +27,8 @@ namespace Trundle
 
         //Menu
         public static Menu menu;
-
+        
+		
         private static Obj_AI_Hero Player;
         private static void Main(string[] args)
         {
@@ -100,6 +101,7 @@ namespace Trundle
             //Misc Menu:
             menu.AddSubMenu(new Menu("Misc", "Misc"));
             menu.SubMenu("Misc").AddItem(new MenuItem("packet", "Use Packets").SetValue(true));
+			menu.SubMenu("Misc").AddItem(new MenuItem("InterruptSpells", "Auto Interrupt").SetValue(true));
 			
 			
             //Damage after combo:
@@ -128,10 +130,12 @@ namespace Trundle
             //Events
             Game.OnGameUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
+			Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
             Game.PrintChat("SG " + ChampionName + " Loaded! ");
         }
 
         
+
         private static float GetComboDamage(Obj_AI_Base enemy)
         {
             var damage = 0d;
@@ -145,6 +149,11 @@ namespace Trundle
             return (float)damage ;
         }
 		
+		private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
+        {
+            if (!menu.Item("InterruptSpells").GetValue<bool>()) return;
+            E.Cast(unit);
+        }
 				
         private static void Combo()
         {
