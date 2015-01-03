@@ -338,10 +338,9 @@ namespace Trundle
                 foreach (var vMinion in minionsQ)
                 {
                   /*   var vMinionQDamage = vPlayer.GetSpellDamage(vMinion, SpellSlot.Q);
-
                     if (vMinion.Health <= vMinionQDamage - 20) */
                         Q.Cast();  
-                        /* Player.IssueOrder(GameObjectOrder.AttackUnit, minion);	 */					
+                    /* Player.IssueOrder(GameObjectOrder.AttackUnit, vMinion);	 */					
                 }
             }
         
