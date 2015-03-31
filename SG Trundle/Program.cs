@@ -130,7 +130,7 @@ namespace Trundle
             menu.AddToMainMenu();
 
             //Events
-            Game.OnGameUpdate += Game_OnGameUpdate;
+            Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
 			Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
             Game.PrintChat("SG " + ChampionName + " Loaded! ");
