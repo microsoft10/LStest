@@ -38,7 +38,7 @@ namespace MasterYiByPrunes
             Config.SubMenu("Combo").AddItem(new MenuItem("ComboActive", "Combo").SetValue(new KeyBind(32, KeyBindType.Press)));
             Config.AddToMainMenu();
             SmiteSlot();
-            Game.OnGameUpdate += Game_OnGameUpdate;
+            Game.OnUpdate += Game_OnGameUpdate;
             Game.PrintChat("<font color='#000FFF'>SG Simple Smite Combo</font>");
         }
 
