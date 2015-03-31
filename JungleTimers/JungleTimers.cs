@@ -218,7 +218,7 @@ namespace JungleTimers
         public JungleTimers()
         {
             _onLoadAction = new CallOnce().A(OnLoad);
-            Game.OnGameUpdate += OnGameUpdate;
+            Game.OnUpdate += OnGameUpdate;
         }
 
         private void OnLoad()
