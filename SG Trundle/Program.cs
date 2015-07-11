@@ -49,8 +49,7 @@ namespace Trundle
             E = new Spell(SpellSlot.E, 1000);
             R = new Spell(SpellSlot.R, 650);
 
-			W.SetSkillshot(.25f, 750f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-			E.SetSkillshot(.25f, 1f, float.MaxValue, false, SkillshotType.SkillshotLine);
+			E.SetSkillshot(.5f, 188f, 1600f, false, SkillshotType.SkillshotCircle);
           
             SpellList.Add(Q);
             SpellList.Add(W);
@@ -180,9 +179,10 @@ namespace Trundle
 
             if (useW && wTarget != null && W.IsReady() && Player.Distance(wTarget) < W.Range)
             {
-                var pred = W.GetPrediction(wTarget);
+               /*  var pred = W.GetPrediction(wTarget);
                 W.Cast(pred.CastPosition);
-                return;
+                return; */
+			   W.CastOnUnit(wTarget);
             }
 
             if (useE && eTarget != null && E.IsReady() && Player.Distance(eTarget) < E.Range)
@@ -231,7 +231,7 @@ namespace Trundle
             PredictionOutput pred = E.GetPrediction(target);
             var vec = new Vector3(pred.CastPosition.X - Player.ServerPosition.X, 0,
                 pred.CastPosition.Z - Player.ServerPosition.Z);
-            Vector3 castBehind = pred.CastPosition + Vector3.Normalize(vec) * 125;
+            Vector3 castBehind = pred.CastPosition + Vector3.Normalize(vec) * 200;
 
             if (E.IsReady())
                 E.Cast(castBehind, packets());
