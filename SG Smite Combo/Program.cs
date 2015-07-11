@@ -54,6 +54,9 @@ namespace MasterYiByPrunes
 			Config.SubMenu("Save").AddItem(new MenuItem("sSmite", "Save me with monsters?").SetValue(true));
             Config.SubMenu("Save").AddItem(new MenuItem("hSmite", "HP use (Purple)").SetValue(new Slider(20, 0, 100)));
 			Config.SubMenu("Save").AddItem(new MenuItem("mSmite", "MP use (Purple)").SetValue(new Slider(10, 0, 100)));
+			
+			Config.SubMenu("KS").AddItem(new MenuItem("ks", "LOL, u are junger -.-' u want ks ur team ?").SetValue(true));
+            
 			            
             Config.AddToMainMenu();
             SmiteSlot();
@@ -70,6 +73,26 @@ namespace MasterYiByPrunes
 			if (Config.Item("sSmite").GetValue<KeyBind>().Active)
             {
                 Save();
+            }
+			
+			var enemys = ObjectManager.Get<Obj_AI_Hero>().Where(h => !h.IsAlly && !h.IsDead && Player.Distance(h, false) <= 500);
+            if (enemys == null || !Config.Item("ks").GetValue<KeyBind>().Active)
+                return;
+            float dmgb = DamageB();
+			float dmgr = DamageR();
+            foreach (var enemy in enemys)
+            {
+                if (smitetype() == "s5_summonersmiteplayerganker" && enemy.Health <= dmgb)
+                {
+                    SmiteSlot();
+                ObjectManager.Player.Spellbook.CastSpell(smiteSlot, enemy);
+                }
+				if (smitetype() == "s5_summonersmiteduel" && enemy.Health <= dmgr)
+                {
+                    SmiteSlot();
+                ObjectManager.Player.Spellbook.CastSpell(smiteSlot, enemy);
+                }
+
             }
         }
 
@@ -108,6 +131,8 @@ namespace MasterYiByPrunes
 			
         }
 		
+	
+		
 
         public static string smitetype()
         {
@@ -125,8 +150,8 @@ namespace MasterYiByPrunes
             }
             return "summonersmite";
         }
-
-        public static void SmiteSlot()
+		
+		public static void SmiteSlot()
         {
             foreach (var spell in ObjectManager.Player.Spellbook.Spells.Where(spell => String.Equals(spell.Name, smitetype(), StringComparison.CurrentCultureIgnoreCase)))
             {
@@ -135,5 +160,22 @@ namespace MasterYiByPrunes
                 return;
             }
         }
+		
+		 private static float DamageB()
+        {
+            int lvlb = ObjectManager.Player.Level;
+            int damageb = (20 + 8 * lvlb);
+
+            return damageb;
+        }
+		
+		 private static float DamageR()
+        {
+            int lvlr = ObjectManager.Player.Level;
+            int damager = (54 + 6 * lvlr);
+
+            return damager;
+        }
+		
     }
 }
