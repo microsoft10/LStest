@@ -28,7 +28,20 @@ namespace MasterYiByPrunes
         }
 
         static void Game_OnGameLoad(EventArgs args)
-        {
+        {	
+			if (ObjectManager.Player.GetSpellSlot("summonersmite") == SpellSlot.Unknown)
+            {
+				if (ObjectManager.Player.GetSpellSlot("s5_summonersmiteplayerganker") == SpellSlot.Unknown)
+				{
+					if (ObjectManager.Player.GetSpellSlot("s5_summonersmiteduel") == SpellSlot.Unknown)
+					{
+						if (ObjectManager.Player.GetSpellSlot("itemsmiteaoe") == SpellSlot.Unknown)
+						{
+				                return;
+						}
+					}
+				}
+            }
             Config = new Menu("SG Smite Combo", "SG Smite Combo", true);
             var ts = new Menu("Target Selector", "Target Selector");  
             TargetSelector.AddToMenu(ts);
