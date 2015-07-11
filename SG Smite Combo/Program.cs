@@ -38,7 +38,6 @@ namespace MasterYiByPrunes
 			Config.SubMenu("Combo").AddItem(new MenuItem("rSmite", "Range use (Red, Blue)").SetValue(new Slider(300, 0, 500)));
 			Config.SubMenu("Combo").AddItem(new MenuItem("ComboActive", "Combo").SetValue(new KeyBind(32, KeyBindType.Press)));
 			
-			Config.AddSubMenu(new Menu("Save", "Save me"));	
 			Config.SubMenu("Save").AddItem(new MenuItem("sSmite", "Save me with monsters?").SetValue(true));
             Config.SubMenu("Save").AddItem(new MenuItem("hSmite", "HP use (Purple)").SetValue(new Slider(20, 0, 100)));
 			Config.SubMenu("Save").AddItem(new MenuItem("mSmite", "MP use (Purple)").SetValue(new Slider(10, 0, 100)));
