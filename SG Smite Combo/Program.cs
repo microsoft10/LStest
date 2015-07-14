@@ -70,10 +70,10 @@ namespace MasterYiByPrunes
             {
                 Combo();
             }
-			if (Config.Item("sSmite").GetValue<KeyBind>().Active)
+		/* 	if (Config.Item("sSmite").GetValue<KeyBind>().Active)
             {
                 Save();
-            }
+            } */
 			
 			var enemys = ObjectManager.Get<Obj_AI_Hero>().Where(h => !h.IsAlly && !h.IsDead && Player.Distance(h, false) <= 500);
             if (enemys == null || !Config.Item("ks").GetValue<KeyBind>().Active)
@@ -94,6 +94,19 @@ namespace MasterYiByPrunes
                 }
 
             }
+			
+			var target = TargetSelector.GetTarget(1000, TargetSelector.DamageType.Physical);
+			var minion = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, 500, MinionTypes.All, MinionTeam.Neutral).FirstOrDefault();; 
+			
+            if (!Config.Item("sSmite").GetValue<KeyBind>().Active) return;
+			             			
+			if (minion != null && target != null && (Player.HealthPercent <= Config.Item("hSmite").GetValue<Slider>().Value || Player.ManaPercent <= Config.Item("mSmite").GetValue<Slider>().Value) &&
+                ObjectManager.Player.Spellbook.CanUseSpell((smiteSlot)) == SpellState.Ready && smitetype() == "itemsmiteaoe")
+            {
+                SmiteSlot();
+                ObjectManager.Player.Spellbook.CastSpell(smiteSlot, minion);
+            }
+			
         }
 
       
@@ -115,21 +128,21 @@ namespace MasterYiByPrunes
 			
         }
 		
-		public static void Save()
+		/* public static void Save()
         {
             var target = TargetSelector.GetTarget(1000, TargetSelector.DamageType.Physical);
-			var minion = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, 500, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth).FirstOrDefault();; 
+			var minion = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, 500, MinionTypes.All, MinionTeam.Neutral).FirstOrDefault();; 
 			
-            if (target == null || minion == null) return;
+            if (target == null) return;
 			             			
-			if ((Player.HealthPercent <= Config.Item("hSmite").GetValue<Slider>().Value || Player.ManaPercent <= Config.Item("mSmite").GetValue<Slider>().Value) &&
+			if (minion != null && (Player.HealthPercent <= Config.Item("hSmite").GetValue<Slider>().Value || Player.ManaPercent <= Config.Item("mSmite").GetValue<Slider>().Value) &&
                 ObjectManager.Player.Spellbook.CanUseSpell((smiteSlot)) == SpellState.Ready && smitetype() == "itemsmiteaoe")
             {
                 SmiteSlot();
                 ObjectManager.Player.Spellbook.CastSpell(smiteSlot, minion);
             }
 			
-        }
+        } */
 		
 	
 		
